@@ -82,8 +82,22 @@ namespace webApi10B.Controllers
 
 
         // PUT: api/Articulo/5
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody] ArticuloDTO articuloDTO)
         {
+            ArticuloNegocio negocio = new ArticuloNegocio();
+            Articulo articulo = new Articulo
+            {
+                Codigo = articuloDTO.Codigo,
+                Nombre = articuloDTO.Nombre,
+                Descripcion = articuloDTO.Descripcion,
+                IdMarca = articuloDTO.IdMarca,
+                IdCategoria = articuloDTO.IdCategoria,
+                Precio = articuloDTO.Precio,
+                Imagenes = articuloDTO.Imagenes.Select(imgDto => new Imagen { ImagenUrl = imgDto.ImagenUrl }).ToList(),
+                Id = id
+            };
+            negocio.modificar(articulo);
+
         }
 
         // DELETE: api/Articulo/5
