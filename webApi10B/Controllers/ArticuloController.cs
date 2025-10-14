@@ -32,9 +32,34 @@ namespace webApi10B.Controllers
         // GET: api/Articulo/5
         public Articulo Get(int id)
         {
-            ArticuloNegocio negocio = new ArticuloNegocio();
-            List<Articulo> articulos = negocio.listar();
-            return articulos.Find(articulo => articulo.Id == id);
+            try
+            {
+                ArticuloNegocio negocio = new ArticuloNegocio();
+                List<Articulo> listaCompleta = negocio.listar();       
+                Articulo articuloEncontrado = null;
+                
+                foreach (Articulo articulo in listaCompleta)
+                {                   
+                    if (articulo.Id == id)
+                    {                     
+                        articuloEncontrado = articulo;                     
+                        break;
+                    }
+                }
+             
+                if (articuloEncontrado == null)
+                {                
+                    return NotFound(); 
+                }
+                else
+                {
+                    return Ok(articuloEncontrado);
+                }
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
         // POST: api/Articulo
