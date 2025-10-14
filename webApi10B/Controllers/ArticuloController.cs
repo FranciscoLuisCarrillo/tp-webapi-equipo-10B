@@ -14,8 +14,18 @@ namespace webApi10B.Controllers
         // GET: api/Articulo
         public IEnumerable<Articulo> Get()
         {
-            ArticuloNegocio negocio = new ArticuloNegocio();
-            return negocio.listar();
+            try
+            {
+                ArticuloNegocio negocio = new ArticuloNegocio();
+                List<Articulo> lista = negocio.listar();
+
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+
 
         }
 
@@ -42,17 +52,13 @@ namespace webApi10B.Controllers
         {
             try
             {
-                ArticuloNegocio negocio = new ArticuloNegocio();
-        
-                Articulo articuloExistente = negocio.listar().FirstOrDefault(a => a.Id == id);
-              
+                ArticuloNegocio negocio = new ArticuloNegocio();        
+                Articulo articuloExistente = negocio.listar().FirstOrDefault(a => a.Id == id);              
                 if (articuloExistente == null)
                 {
                     return NotFound();
-                }
-        
-                negocio.eliminar(id);
-               
+                }        
+                negocio.eliminar(id);               
                 return Ok();
             }
             catch (Exception ex)
