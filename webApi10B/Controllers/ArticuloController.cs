@@ -1,4 +1,6 @@
-﻿using System;
+﻿using dominio;
+using negocio;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,15 +12,19 @@ namespace webApi10B.Controllers
     public class ArticuloController : ApiController
     {
         // GET: api/Articulo
-        public IEnumerable<string> Get()
+        public IEnumerable<Articulo> Get()
         {
-            return new string[] { "value1", "value2" };
+            ArticuloNegocio negocio = new ArticuloNegocio();
+            return negocio.listar();
+
         }
 
         // GET: api/Articulo/5
-        public string Get(int id)
+        public Articulo Get(int id)
         {
-            return "value";
+            ArticuloNegocio negocio = new ArticuloNegocio();
+            List<Articulo> articulos = negocio.listar();
+            return articulos.Find(articulo => articulo.Id == id);
         }
 
         // POST: api/Articulo
