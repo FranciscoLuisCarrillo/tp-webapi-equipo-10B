@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using webApi10B.Models;
 
 namespace webApi10B.Controllers
 {
@@ -63,9 +64,22 @@ namespace webApi10B.Controllers
         }
 
         // POST: api/Articulo
-        public void Post([FromBody]string value)
+        public void Post([FromBody] ArticuloDTO articuloDTO)
         {
+            ArticuloNegocio negocio = new ArticuloNegocio();
+            Articulo articulo = new Articulo
+            {
+                Codigo = articuloDTO.Codigo,
+                Nombre = articuloDTO.Nombre,
+                Descripcion = articuloDTO.Descripcion,
+                IdMarca = articuloDTO.IdMarca,
+                IdCategoria = articuloDTO.IdCategoria,
+                Precio = articuloDTO.Precio,
+                Imagenes = articuloDTO.Imagenes.Select(imgDto => new Imagen { ImagenUrl = imgDto.ImagenUrl }).ToList()
+            };
+            negocio.agregar(articulo);
         }
+
 
         // PUT: api/Articulo/5
         public void Put(int id, [FromBody]string value)
