@@ -40,6 +40,25 @@ namespace webApi10B.Controllers
         // DELETE: api/Articulo/5
         public void Delete(int id)
         {
+            try
+            {
+                ArticuloNegocio negocio = new ArticuloNegocio();
+        
+                Articulo articuloExistente = negocio.listar().FirstOrDefault(a => a.Id == id);
+              
+                if (articuloExistente == null)
+                {
+                    return NotFound();
+                }
+        
+                negocio.eliminar(id);
+               
+                return Ok();
+            }
+            catch (Exception ex)
+            {               
+                return InternalServerError(ex);
+            }
         }
     }
 }
