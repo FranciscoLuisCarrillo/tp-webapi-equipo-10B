@@ -53,26 +53,37 @@ namespace webApi10B.Controllers
         }
 
         // POST: api/Articulo
-        public HttpResponseMessage Post([FromBody] Articulo nuevo)
+        public HttpResponseMessage Post([FromBody] ArticuloDTO nuevoDto)
         {
             try
             {
-                if (nuevo == null || string.IsNullOrEmpty(nuevo.Codigo) || string.IsNullOrEmpty(nuevo.Nombre))
+                if (nuevoDto == null || string.IsNullOrEmpty(nuevoDto.Codigo) || string.IsNullOrEmpty(nuevoDto.Nombre))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "El código y el nombre son campos obligatorios.");
                 }
 
                 MarcaNegocio marcaNegocio = new MarcaNegocio();
-                if (!marcaNegocio.listar().Any(m => m.Id == nuevo.IdMarca))
+                if (!marcaNegocio.listar().Any(m => m.Id == nuevoDto.IdMarca))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "La marca con el ID especificado no existe.");
                 }
 
                 CategoriaNegocio categoriaNegocio = new CategoriaNegocio();
-                if (!categoriaNegocio.listar().Any(c => c.Id == nuevo.IdCategoria))
+                if (!categoriaNegocio.listar().Any(c => c.Id == nuevoDto.IdCategoria))
                 {
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "La categoría con el ID especificado no existe.");
                 }
+
+                Articulo nuevo = new Articulo
+                {
+                    Codigo = nuevoDto.Codigo,
+                    Nombre = nuevoDto.Nombre,
+                    Descripcion = nuevoDto.Descripcion,
+                    IdMarca = nuevoDto.IdMarca,
+                    IdCategoria = nuevoDto.IdCategoria,
+                    Precio = nuevoDto.Precio,
+                    Imagenes = nuevoDto.Imagenes.Select(i => new Imagen { ImagenUrl = i.ImagenUrl }).ToList()
+                };
 
                 ArticuloNegocio negocio = new ArticuloNegocio();
                 negocio.agregar(nuevo);
@@ -85,30 +96,42 @@ namespace webApi10B.Controllers
             }
         }
 
-
         // PUT: api/Articulo/5
-        public HttpResponseMessage Put(int id, [FromBody] Articulo articulo)
+        public HttpResponseMessage Put(int id, [FromBody] ArticuloDTO dto)
         {
             try
             {
-                ArticuloNegocio negocio = new ArticuloNegocio();
+                if (dto == null)
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Body vacío.");
 
+                var negocio = new ArticuloNegocio();
                 if (!negocio.listar().Any(a => a.Id == id))
-                {
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "El artículo a modificar no existe.");
-                }
 
-                MarcaNegocio marcaNegocio = new MarcaNegocio();
-                if (!marcaNegocio.listar().Any(m => m.Id == articulo.IdMarca))
-                {
+                var marcaNegocio = new MarcaNegocio();
+                if (!marcaNegocio.listar().Any(m => m.Id == dto.IdMarca))
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "La marca especificada no existe.");
-                }
 
-                
-                articulo.Id = id;
+                var categoriaNegocio = new CategoriaNegocio();
+                if (!categoriaNegocio.listar().Any(c => c.Id == dto.IdCategoria))
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "La categoría especificada no existe.");
+
+
+                var articulo = new Articulo
+                {
+                    Id = id,
+                    Codigo = dto.Codigo,
+                    Nombre = dto.Nombre,
+                    Descripcion = dto.Descripcion,
+                    IdMarca = dto.IdMarca,
+                    IdCategoria = dto.IdCategoria,
+                    Precio = dto.Precio,
+                    Imagenes = dto.Imagenes?.Select(i => new Imagen { ImagenUrl = i.ImagenUrl }).ToList()
+                                  ?? new List<Imagen>()
+                };
+
                 negocio.modificar(articulo);
 
-              
                 return Request.CreateResponse(HttpStatusCode.OK, "Artículo modificado exitosamente.");
             }
             catch (Exception ex)
